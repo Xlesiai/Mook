@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +34,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mook.ui.theme.MookTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -48,7 +51,7 @@ class MainActivity : ComponentActivity() {
                     drawerState = drawerState,
                     drawerContent = {
                         ModalDrawerSheet {
-                            drawer(navController)
+                            drawer(navController, scope, drawerState)
                         }
                     }
                 ) {
@@ -69,7 +72,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun drawer(navController: NavHostController) {
+fun drawer(navController: NavHostController, scope: CoroutineScope, drawerState: DrawerState) {
     Text("Navigation Drawer",
         modifier = Modifier
             .padding(16.dp))
@@ -85,7 +88,12 @@ fun drawer(navController: NavHostController) {
                 label = {Text(text = "Library")},
                 selected = false,
                 onClick = {
-                          navController.navigate("library")
+                    navController.navigate("library")
+                    scope.launch {
+                        drawerState.apply {
+                            if (isClosed) open() else close()
+                        }
+                    }
                 },
                 modifier = Modifier
             )
@@ -95,6 +103,11 @@ fun drawer(navController: NavHostController) {
                 selected = false,
                 onClick = {
                     navController.navigate("trending")
+                    scope.launch {
+                        drawerState.apply {
+                            if (isClosed) open() else close()
+                        }
+                    }
                 },
                 modifier = Modifier
             )
