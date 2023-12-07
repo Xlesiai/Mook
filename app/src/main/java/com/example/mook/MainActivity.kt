@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,6 +65,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.codepath.asynchttpclient.AsyncHttpClient
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
 import com.example.mook.helper.Book
@@ -71,12 +75,15 @@ import kotlinx.coroutines.launch
 import okhttp3.Headers
 import kotlin.system.exitProcess
 
+lateinit var context: Context
+
 class MainActivity : ComponentActivity() {
 private lateinit var library: SharedPreferences
-private lateinit var context: Context
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            context = LocalContext.current
             val navController = rememberNavController()
             library = getSharedPreferences("library", MODE_PRIVATE)
             MookTheme {
@@ -351,12 +358,15 @@ fun AddBooks() {
                     height = Dimension.fillToConstraints
                 }
                 .clip(RoundedCornerShape(10))
-                .background(Color(0, 0, 0, 50))
+                .background(Color(0, 0, 0, 50)),
 
         ){
             items(searchResults.size){
                 SearchBookResult(book = searchResults[it])
+                Divider()
+
             }
+
         }
         IconButton(
             onClick = {
@@ -392,7 +402,7 @@ fun AddBooks() {
                                     val book = Book(
                                         obj.getString("title"),
                                         obj.getJSONArray("author_name")[0].toString(),
-                                        "https://covers.openlibrary.org/a/olid/${obj.getString("cover_edition_key")}-M.jpg"
+                                        "https://covers.openlibrary.org/b/olid/${obj.getString("cover_edition_key")}-M.jpg"
                                     )
                                     searchResults.add(book)
                                 }
@@ -436,7 +446,7 @@ fun LibraryBook() {
     ConstraintLayout(
         modifier = Modifier
             .height(400.dp)
-            .width(300.dp)
+            .width(300.dp),
     ) {
         val (image, title, author) = createRefs()
         Image(
@@ -485,10 +495,17 @@ fun SearchBookResult(book: Book) {
         modifier = Modifier
             .height(100.dp)
             .fillMaxWidth()
+            .clickable {
+                
+            }
     ){
         val (image, title, author) = createRefs()
         AsyncImage(
-            model = book.cover,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(book.cover)
+                .crossfade(true)
+                .build(),
+            placeholder = painterResource(R.drawable.baseline_square_24),
             contentDescription = null,
             modifier = Modifier
                 .constrainAs(image) {
@@ -505,7 +522,8 @@ fun SearchBookResult(book: Book) {
                     top.linkTo(parent.top)
                     start.linkTo(image.end, 16.dp)
                     bottom.linkTo(author.top)
-                }
+                },
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
             text = book.author,
@@ -514,7 +532,9 @@ fun SearchBookResult(book: Book) {
                     top.linkTo(title.bottom)
                     start.linkTo(image.end, 32.dp)
                     bottom.linkTo(parent.bottom)
-                }
+                },
+            color = MaterialTheme.colorScheme.primary
+
         )
     }
     
