@@ -20,8 +20,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import com.example.mook.database.LibraryBook
 import com.example.mook.database.LibraryDatabase
-import com.example.mook.database.LibraryState
 import com.example.mook.database.LibraryViewModel
 import com.example.mook.dialogs.BookDialog
 import com.example.mook.fragments.AddBooks
@@ -91,6 +91,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun prev() {
     MookTheme {
-        BookDialog(state = LibraryState(), onEvent = {}, modifier = Modifier)
+        BookDialog(LibraryBook("Harry", "Rowling"), onEvent = {}, modifier = Modifier)
     }
 }

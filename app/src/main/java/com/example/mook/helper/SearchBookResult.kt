@@ -15,11 +15,11 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.mook.R
+import com.example.mook.database.LibraryBook
 import com.example.mook.database.LibraryEvent
-import com.example.mook.database.LibraryState
 
 @Composable
-fun SearchBookResult(book: Book, state: LibraryState, onEvent: (LibraryEvent) -> Unit) {
+fun SearchBookResult(book: LibraryBook, onEvent: (LibraryEvent) -> Unit) {
     ConstraintLayout (
         modifier = Modifier
             .height(100.dp)

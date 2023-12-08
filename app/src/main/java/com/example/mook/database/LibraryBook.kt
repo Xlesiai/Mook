@@ -9,8 +9,8 @@ data class LibraryBook(
     val title: String,
     @ColumnInfo(name = "author")
     val author: String,
-    val description: String?,
-    val cover: String?,
-    val text: String?,
-    val audio: String?
+    val description: String? = null,
+    val cover: String? = null,
+    val text: String? = null,
+    val audio: String? = null
 )

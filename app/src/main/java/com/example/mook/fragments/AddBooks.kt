@@ -2,7 +2,6 @@ package com.example.mook.fragments
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -31,17 +30,17 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.codepath.asynchttpclient.AsyncHttpClient
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
+import com.example.mook.database.LibraryBook
 import com.example.mook.database.LibraryState
 import com.example.mook.database.LibraryViewModel
 import com.example.mook.dialogs.BookDialog
-import com.example.mook.helper.Book
 import com.example.mook.helper.SearchBookResult
 import okhttp3.Headers
 import kotlin.system.exitProcess
 
 @Composable
 fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context) {
-    val searchResults = remember { mutableStateListOf(Book()) }
+    val searchResults = remember { mutableStateListOf<LibraryBook>() }
     var title by remember{ mutableStateOf("") }
     var author by remember{ mutableStateOf("") }
     val client = AsyncHttpClient()
@@ -56,6 +55,7 @@ fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context)
             searchAuthorText, searchAuthorBox,
             enterButton, results, dialog
         ) = createRefs()
+
 
         Text(
             text = "Title: ",
@@ -124,9 +124,21 @@ fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context)
 
             ){
             items(searchResults.size){
-                SearchBookResult(searchResults[it], state, viewModel::onEvent)
+                SearchBookResult(searchResults[it], viewModel::onEvent)
                 Divider()
+                if (state.isAddingBook) {
+                    BookDialog(
+                        searchResults[it],
+                        viewModel::onEvent,
+                        Modifier.constrainAs(dialog) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                        }
 
+                    )
+                }
             }
 
         }
@@ -161,10 +173,12 @@ fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context)
                                 for (i in 0 until docsArray.length()) {
                                     val obj = docsArray.getJSONObject(i)
                                     try {
-                                        val book = Book(
+                                        val book = LibraryBook(
                                             obj.getString("title"),
                                             obj.getJSONArray("author_name")[0].toString(),
-                                            "https://covers.openlibrary.org/b/olid/${obj.getString("cover_edition_key")}-M.jpg"
+                                            "No Description",
+                                            "https://covers.openlibrary.org/b/olid/${obj.getString("cover_edition_key")}-M.jpg",
+
                                         )
                                         searchResults.add(book)
                                     }
@@ -197,18 +211,6 @@ fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context)
 
             )
         }
-        if (state.isAddingBook) {
-            Toast.makeText(context, "Adding book", Toast.LENGTH_SHORT).show()
-            BookDialog(
-                book,
-                viewModel::onEvent,
-                Modifier.constrainAs(dialog) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                }
-            )
-        }
+
     }
 }
