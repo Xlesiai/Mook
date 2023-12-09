@@ -17,4 +17,5 @@ sealed interface LibraryEvent {
     // Helper
     data class SortBooks(val sortType: SortType): LibraryEvent
     data class DeleteBook(val book: LibraryBook) : LibraryEvent
+
 }

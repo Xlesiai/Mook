@@ -11,6 +11,6 @@ data class LibraryBook(
     val author: String,
     val description: String? = null,
     val cover: String? = null,
-    val text: String? = null,
-    val audio: String? = null
+    var text: String? = null,
+    var audio: String? = null
 )

@@ -127,15 +127,12 @@ fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context)
                 SearchBookResult(searchResults[it], viewModel::onEvent)
                 Divider()
                 if (state.isAddingBook) {
-                    BookDialog(
-                        searchResults[it],
-                        viewModel::onEvent,
-                        Modifier.constrainAs(dialog) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            bottom.linkTo(parent.bottom)
-                        }
+                    BookDialog(searchResults[it], viewModel::onEvent, Modifier.constrainAs(dialog) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                    }
 
                     )
                 }
