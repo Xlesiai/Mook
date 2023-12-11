@@ -1,9 +1,13 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     kotlin("jvm") apply false
+
 }
+
 
 android {
     namespace = "com.example.mook"
@@ -20,11 +24,15 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        val apikeyProperties = Properties()
+        apikeyProperties.load(project.rootProject.file("apikey.properties").inputStream())
+
+        buildConfigField("String", "CHAT_GPT_KEY", apikeyProperties.getProperty("CHAT_GPT_KEY"))
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -41,6 +49,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"

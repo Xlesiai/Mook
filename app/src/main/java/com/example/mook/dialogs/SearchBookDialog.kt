@@ -50,7 +50,7 @@ fun BookDialog(book: LibraryBook,
 ) {
     AlertDialog(
         onDismissRequest = {
-           onEvent(LibraryEvent.HideDialog)
+
         },
         modifier = modifier
     ) {
@@ -92,8 +92,7 @@ fun BookDialog(book: LibraryBook,
                                 text = book.description ?: "No description",
                                 softWrap = true,
                                 style = MaterialTheme.typography.bodySmall,
-                                // Fix that
-                                fontSize = TextUnit(12.sp )
+
                             )
                         }
 

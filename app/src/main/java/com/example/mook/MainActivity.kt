@@ -32,7 +32,6 @@ import com.example.mook.navigation.Drawer
 import com.example.mook.ui.theme.MookTheme
 
 
-
 class MainActivity : ComponentActivity() {
     private val db by lazy {
         Room.databaseBuilder(
@@ -54,6 +53,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+
 
             MookTheme {
                 val state by viewModel.state.collectAsState()

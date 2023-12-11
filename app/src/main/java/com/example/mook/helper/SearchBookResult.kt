@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -17,15 +21,18 @@ import coil.request.ImageRequest
 import com.example.mook.R
 import com.example.mook.database.LibraryBook
 import com.example.mook.database.LibraryEvent
+import com.example.mook.database.LibraryState
+import com.example.mook.dialogs.BookDialog
 
 @Composable
-fun SearchBookResult(book: LibraryBook, onEvent: (LibraryEvent) -> Unit) {
+fun SearchBookResult(book: LibraryBook, onEvent: (LibraryEvent) -> Unit, state: LibraryState) {
+    var clickBook by remember{ mutableStateOf(false) }
     ConstraintLayout (
         modifier = Modifier
             .height(100.dp)
             .fillMaxWidth()
             .clickable {
-                onEvent(LibraryEvent.ShowDialog)
+                clickBook = true
             }
     ){
         val (image, title, author) = createRefs()
@@ -65,6 +72,10 @@ fun SearchBookResult(book: LibraryBook, onEvent: (LibraryEvent) -> Unit) {
             color = MaterialTheme.colorScheme.primary
 
         )
+        if (clickBook) {
+            // Figure out how to pass clickBook to quit dialog
+            BookDialog(book, onEvent, Modifier)
+        }
     }
 
 }

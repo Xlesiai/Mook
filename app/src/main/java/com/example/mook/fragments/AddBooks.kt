@@ -33,7 +33,6 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
 import com.example.mook.database.LibraryBook
 import com.example.mook.database.LibraryState
 import com.example.mook.database.LibraryViewModel
-import com.example.mook.dialogs.BookDialog
 import com.example.mook.helper.SearchBookResult
 import okhttp3.Headers
 import kotlin.system.exitProcess
@@ -124,18 +123,9 @@ fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context)
 
             ){
             items(searchResults.size){
-                SearchBookResult(searchResults[it], viewModel::onEvent)
+                SearchBookResult(searchResults[it], viewModel::onEvent, state)
                 Divider()
-                if (state.isAddingBook) {
-                    BookDialog(searchResults[it], viewModel::onEvent, Modifier.constrainAs(dialog) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(parent.bottom)
-                    }
 
-                    )
-                }
             }
 
         }
@@ -148,9 +138,9 @@ fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context)
                 val new_author = author.replace(" ", "+")
                 var link = "https://openlibrary.org/search.json?title=$new_title&author=$new_author&fields=title,author_name,cover_edition_key"
                 if (new_title.isBlank())
-                    link = "https://openlibrary.org/search.json?author=$new_author&fields=title,author_name,cover_edition_key"
+                    link = "https://openlibrary.org/search.json?author=$new_author&fields=title,author_name,cover_edition_key,key"
                 if (new_author.isBlank())
-                    link = "https://openlibrary.org/search.json?title=$new_title&fields=title,author_name,cover_edition_key"
+                    link = "https://openlibrary.org/search.json?title=$new_title&fields=title,author_name,cover_edition_key,key"
                 if (new_author.isBlank() and new_title.isBlank())
                     exitProcess(0)
 
@@ -169,15 +159,48 @@ fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context)
                             json?.jsonObject?.getJSONArray("docs")?.let { docsArray ->
                                 for (i in 0 until docsArray.length()) {
                                     val obj = docsArray.getJSONObject(i)
+                                    var desc = "No Description"
+                                    val key = obj.getString("key")
+
                                     try {
+                                        client["https://openlibrary.org${key}.json", object: JsonHttpResponseHandler() {
+                                            override fun onFailure(
+                                                statusCode: Int,
+                                                headers: Headers?,
+                                                response: String?,
+                                                throwable: Throwable?
+                                            ) {
+
+                                            }
+
+                                            override fun onSuccess(
+                                                statusCode: Int,
+                                                headers: Headers?,
+                                                json: JSON
+                                            ) {
+                                                try {
+                                                    desc =
+                                                        json.jsonObject.getJSONObject("description")
+                                                            .getString("value") as String
+                                                } catch (e: Exception) {
+                                                    Log.e("$key Description: ", e.toString().removePrefix("org.json.JSONException: Value "))
+
+                                                }
+                                            }
+
+                                        }]
+                                        if (desc == "") {
+                                            continue
+                                        }
                                         val book = LibraryBook(
                                             obj.getString("title"),
                                             obj.getJSONArray("author_name")[0].toString(),
-                                            "No Description",
+                                            desc,
                                             "https://covers.openlibrary.org/b/olid/${obj.getString("cover_edition_key")}-M.jpg",
 
                                         )
                                         searchResults.add(book)
+                                        Log.d("OpenLibrary Book", book.toString())
                                     }
                                     catch (e:Exception){
                                         Log.e("OpenLibrary", e.toString())
