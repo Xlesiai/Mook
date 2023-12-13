@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.example.mook.database.LibraryState
+import com.example.mook.helper.LibraryBook
 
 @Composable
 fun Library(state: LibraryState, navController: NavHostController) {
@@ -43,7 +44,7 @@ fun Library(state: LibraryState, navController: NavHostController) {
 
 
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(3.dp),
+                columns = GridCells.Adaptive(100.dp),
                 modifier = Modifier
                     .constrainAs(grid) {
                         top.linkTo(editButton.bottom)
@@ -52,11 +53,10 @@ fun Library(state: LibraryState, navController: NavHostController) {
                         bottom.linkTo(parent.bottom)
                     }
                     .fillMaxSize()
-                    .background(Color(0, 255, 0, 20))
             ){
                 // Display User's Library
                 items(state.books){
-                    Text(it.toString())
+                    LibraryBook(it)
                 }
             }
             IconButton(

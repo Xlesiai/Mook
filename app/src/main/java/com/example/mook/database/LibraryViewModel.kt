@@ -52,13 +52,7 @@ class LibraryViewModel(
                 val text = state.value.text
                 val audio = state.value.audio
 
-                if (title.isEmpty() ||
-                    author.isEmpty() ||
-                    description.isEmpty() ||
-                    cover.isEmpty() ||
-                    text.isEmpty() ||
-                    audio.isEmpty()
-                    ){
+                if (title.isEmpty() || author.isEmpty()){
                     return
                 }
                 val book = LibraryBook(title, author, description, cover, text, audio)

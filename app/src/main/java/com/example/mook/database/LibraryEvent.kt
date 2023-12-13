@@ -1,7 +1,7 @@
 package com.example.mook.database
 
 sealed interface LibraryEvent {
-    object SaveBook: LibraryEvent
+    data object SaveBook: LibraryEvent
     // Setters
     data class SetTitle(val title: String) : LibraryEvent
     data class SetAuthor(val author: String) : LibraryEvent
@@ -11,8 +11,8 @@ sealed interface LibraryEvent {
     data class SetAudio(val audio: String) : LibraryEvent
 
     // Dialog
-    object ShowDialog: LibraryEvent
-    object HideDialog: LibraryEvent
+    data object ShowDialog: LibraryEvent
+    data object HideDialog: LibraryEvent
 
     // Helper
     data class SortBooks(val sortType: SortType): LibraryEvent
