@@ -54,7 +54,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-
             MookTheme {
                 val state by viewModel.state.collectAsState()
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -75,7 +74,7 @@ class MainActivity : ComponentActivity() {
                         composable("library")   { Library(state, navController)}
                         composable("trending")  { Trending() }
                         composable("settings")  { Settings() }
-                        composable("add books") { AddBooks(state, viewModel, applicationContext) }
+                        composable("add books") { AddBooks(state, viewModel)}
                     }
                 }
 

@@ -1,6 +1,5 @@
 package com.example.mook.fragments
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +37,7 @@ import okhttp3.Headers
 import kotlin.system.exitProcess
 
 @Composable
-fun AddBooks(state: LibraryState, viewModel: LibraryViewModel, context: Context) {
+fun AddBooks(state: LibraryState, viewModel: LibraryViewModel) {
     val searchResults = remember { mutableStateListOf<LibraryBook>() }
     var title by remember{ mutableStateOf("") }
     var author by remember{ mutableStateOf("") }
