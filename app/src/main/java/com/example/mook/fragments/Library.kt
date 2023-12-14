@@ -1,5 +1,6 @@
 package com.example.mook.fragments
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -28,12 +29,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.mook.database.LibraryState
+import com.example.mook.database.LibraryViewModel
 import com.example.mook.helper.LibraryBook
 import com.example.mook.navigation.MiniNav
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun Library(state: LibraryState, navController: NavHostController) {
+fun Library(state: LibraryState, navController: NavHostController, viewModel: LibraryViewModel) {
     Surface (modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colorScheme.background)
@@ -89,7 +91,7 @@ fun Library(state: LibraryState, navController: NavHostController) {
                 ){
                     // Display User's Library
                     items(state.books){
-                        LibraryBook(it, isEditClicked)
+                        LibraryBook(it, isEditClicked, viewModel::onEvent, navController)
                     }
                 }
 

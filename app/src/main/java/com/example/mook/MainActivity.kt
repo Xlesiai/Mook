@@ -16,9 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.room.Room
 import com.example.mook.database.LibraryBook
 import com.example.mook.database.LibraryDatabase
@@ -26,6 +28,7 @@ import com.example.mook.database.LibraryViewModel
 import com.example.mook.dialogs.BookDialog
 import com.example.mook.fragments.AddBooks
 import com.example.mook.fragments.Library
+import com.example.mook.fragments.PlayBook
 import com.example.mook.fragments.Settings
 import com.example.mook.fragments.Trending
 import com.example.mook.navigation.Drawer
@@ -71,10 +74,21 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = "library"
                     ) {
-                        composable("library")   { Library(state, navController)}
+                        composable("library")   { Library(state, navController, viewModel)}
                         composable("trending")  { Trending() }
                         composable("settings")  { Settings() }
                         composable("add books") { AddBooks(state, viewModel)}
+                        composable("play book/{title}/{author}",
+                            arguments = listOf(
+                                navArgument("title"){type = NavType.StringType},
+                                navArgument("author"){type = NavType.StringType}
+                            )
+                        ) {
+                            PlayBook(
+                                it.arguments?.getString("title")?: "",
+                                it.arguments?.getString("author")?: "",
+                                viewModel)
+                        }
                     }
                 }
 

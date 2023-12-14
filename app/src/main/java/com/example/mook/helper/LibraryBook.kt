@@ -1,6 +1,9 @@
 package com.example.mook.helper
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,14 +20,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.mook.database.LibraryBook
+import com.example.mook.database.LibraryEvent
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LibraryBook(book: LibraryBook, edit: Boolean) {
+fun LibraryBook(book: LibraryBook, edit: Boolean, onEvent: (LibraryEvent) -> Unit, navController: NavController) {
     ConstraintLayout(
         modifier = Modifier
-            .padding(top = 10.dp),
+            .padding(top = 10.dp)
+            .clickable {
+                navController.navigate("play book/${book.title}/${book.author}")
+            }
+            .combinedClickable {
+
+            },
     ) {
         val (image, editButton) = createRefs()
         AsyncImage(
@@ -39,14 +51,17 @@ fun LibraryBook(book: LibraryBook, edit: Boolean) {
             contentScale = ContentScale.FillBounds
         )
 
-        if (true) {
+        if (edit) {
             IconButton(
-                onClick = { },
-                Modifier.constrainAs(editButton){
-                    top.linkTo(image.top)
-                    end.linkTo(image.end)
+                onClick = {
+                          onEvent(LibraryEvent.DeleteBook(book))
+                },
+                Modifier
+                    .constrainAs(editButton) {
+                        top.linkTo(image.top)
+                        end.linkTo(image.end)
 
-                }
+                    }
                     .clip(CircleShape)
                     .height(25.dp)
                     .width(25.dp)
