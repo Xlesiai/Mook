@@ -20,5 +20,6 @@ interface LibraryDAO {
 
     @Query("SELECT * FROM Library Order by title ASC")
     fun getBooksByTitle(): Flow<List<LibraryBook>>
-
+    @Query("SELECT * FROM Library WHERE title = :title AND author = :author")
+    fun searchBook(title: String, author: String): Flow<LibraryBook>
 }

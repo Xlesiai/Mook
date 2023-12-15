@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mook.database.SortType.AUTHOR
 import com.example.mook.database.SortType.TITLE
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -124,5 +125,10 @@ class LibraryViewModel(
                 _sortType.value = event.sortType
             }
         }
+    }
+
+    fun seachBook(title: String, author: String): Flow<LibraryBook>
+    {
+        return dao.searchBook(title, author)
     }
 }

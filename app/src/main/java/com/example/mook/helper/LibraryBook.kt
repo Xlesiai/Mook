@@ -1,5 +1,6 @@
 package com.example.mook.helper
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,12 +32,6 @@ fun LibraryBook(book: LibraryBook, edit: Boolean, onEvent: (LibraryEvent) -> Uni
     ConstraintLayout(
         modifier = Modifier
             .padding(top = 10.dp)
-            .clickable {
-                navController.navigate("play book/${book.title}/${book.author}")
-            }
-            .combinedClickable {
-
-            },
     ) {
         val (image, editButton) = createRefs()
         AsyncImage(
@@ -47,8 +42,16 @@ fun LibraryBook(book: LibraryBook, edit: Boolean, onEvent: (LibraryEvent) -> Uni
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
+                }.clickable {
+
+                    Log.d("Library Fragment", "Go to Library Book")
+                    navController.navigate("play book/${book.title}/${book.author}")
+                }
+                .combinedClickable {
+
                 },
-            contentScale = ContentScale.FillBounds
+            contentScale = ContentScale.FillBounds,
+
         )
 
         if (edit) {
