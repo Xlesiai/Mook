@@ -1,6 +1,12 @@
 pluginManagement {
     repositories {
-        google()
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
         mavenCentral()
         gradlePluginPortal()
     }
@@ -15,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Mook"
 include(":app")
+include(":database")
+include(":AI")
