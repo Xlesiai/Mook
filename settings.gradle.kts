@@ -21,5 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Mook"
 include(":app")
-include(":database")
-include(":AI")
+ 
