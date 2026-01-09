@@ -1,4 +1,3 @@
-// com.example.mook.data.local.datasource.SettingsDataSourceImpl.kt
 package com.example.mook.data.local.datasource
 
 import android.content.Context
@@ -13,6 +12,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// This MUST be at top level, outside any class
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 @Singleton
@@ -20,26 +20,25 @@ class SettingsDataSourceImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : SettingsDataSource {
 
-    private object PreferencesKeys {
+    private companion object {
         val LIBRARY_FOLDER_URI = stringPreferencesKey("library_folder_uri")
     }
 
     override suspend fun saveLibraryFolderUri(uriString: String) {
-        // ✅ Use the 'edit' extension function
         context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.LIBRARY_FOLDER_URI] = uriString
+            preferences[LIBRARY_FOLDER_URI] = uriString
         }
     }
 
     override suspend fun getLibraryFolderUri(): String? {
         return context.dataStore.data
-            .map { preferences -> preferences[PreferencesKeys.LIBRARY_FOLDER_URI] }
+            .map { preferences -> preferences[LIBRARY_FOLDER_URI] }
             .first()
     }
 
     override suspend fun clearLibraryFolderUri() {
         context.dataStore.edit { preferences ->
-            preferences.remove(PreferencesKeys.LIBRARY_FOLDER_URI)
+            preferences.remove(LIBRARY_FOLDER_URI)
         }
     }
 }

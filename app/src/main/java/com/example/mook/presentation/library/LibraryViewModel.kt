@@ -1,15 +1,12 @@
-// Update your com.example.mook.presentation.library.LibraryViewModel.kt
 package com.example.mook.presentation.library
 
 import android.app.Application
-import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mook.data.local.database.entities.BookEntity
 import com.example.mook.domain.repository.BookRepository
 import com.example.mook.service.scanner.AudiobookScanner
-import com.example.mook.data.local.datasource.SettingsDataSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +18,6 @@ import javax.inject.Inject
 class LibraryViewModel @Inject constructor(
     private val bookRepository: BookRepository,
     private val audiobookScanner: AudiobookScanner,
-    private val settingsDataSource: SettingsDataSource,
     private val application: Application
 ) : ViewModel() {
 
@@ -66,29 +62,11 @@ class LibraryViewModel @Inject constructor(
         }
     }
 
-    fun startFolderPickerIntent(): Intent {
-        return FolderPickerActivity.createIntent(application as android.app.Activity)
-    }
-
-    fun handleFolderPickerResult(resultCode: Int, data: Intent?) {
-        if (resultCode == android.app.Activity.RESULT_OK) {
-            val uriString = data?.getStringExtra(FolderPickerActivity.EXTRA_SELECTED_URI)
-            if (uriString != null) {
-                val uri = Uri.parse(uriString)
-                scanFolder(uri)
-            }
-        }
-    }
-
-    private fun scanFolder(uri: Uri) {
+    fun scanFolder(uri: Uri) {
         viewModelScope.launch {
             _scanningState.value = ScanningState.Scanning(0)
 
             try {
-                // 1. Save the URI first
-                settingsDataSource.saveLibraryFolderUri(uri.toString())
-
-                // 2. Now scan with the URI
                 val scannedBooks = audiobookScanner.scanDirectory(uri)
 
                 // Insert scanned books into database
@@ -110,19 +88,33 @@ class LibraryViewModel @Inject constructor(
             }
         }
     }
-    fun scanFromSavedLibrary() {
+
+    // For testing - add sample data
+    fun addSampleBooks() {
         viewModelScope.launch {
-            val savedUri = settingsDataSource.getLibraryFolderUri()
-            if (savedUri != null) {
-                val uri = Uri.parse(savedUri)
-                scanFolder(uri)
-            }
+            val sampleBooks = listOf(
+                BookEntity(
+                    title = "The Hobbit",
+                    author = "J.R.R. Tolkien",
+                    folderPath = "/storage/emulated/0/Audiobooks/Tolkien/The Hobbit",
+                    description = "Bilbo Baggins embarks on an unexpected journey",
+                    year = 1937,
+                    isTTSGenerated = false
+                ),
+                BookEntity(
+                    title = "Dune",
+                    author = "Frank Herbert",
+                    folderPath = "/storage/emulated/0/Audiobooks/Herbert/Dune",
+                    description = "Epic science fiction set in the distant future",
+                    year = 1965,
+                    isTTSGenerated = true
+                )
+            )
+
+            sampleBooks.forEach { bookRepository.insertBook(it) }
+            loadBooks()
         }
     }
-    suspend fun checkForExistingLibrary(): Boolean {
-        return settingsDataSource.getLibraryFolderUri() != null
-    }
-
 }
 
 data class LibraryUiState(
