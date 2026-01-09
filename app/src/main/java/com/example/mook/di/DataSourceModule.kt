@@ -16,6 +16,6 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindSettingsDataSource(
-        settingsDataSourceImpl: SettingsDataSourceImpl
+        impl: SettingsDataSourceImpl
     ): SettingsDataSource
 }

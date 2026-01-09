@@ -95,7 +95,8 @@ class FolderPickerActivity : ComponentActivity() {
 fun FolderPickerScreen(
     onPickFolder: () -> Unit,
     onCancel: () -> Unit
-) {
+)
+{
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
