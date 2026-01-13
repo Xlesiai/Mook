@@ -14,6 +14,7 @@ import com.example.mook.presentation.player.PlayerScreen
 import com.example.mook.presentation.settings.SettingsScreen
 import com.example.mook.ui.theme.MookTheme
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -31,7 +32,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainApp() {
     val navController = rememberNavController()
-
+    if (BuildConfig.DEBUG) {
+        Timber.plant(Timber.DebugTree())
+    }
     NavHost(
         navController = navController,
         startDestination = "library"

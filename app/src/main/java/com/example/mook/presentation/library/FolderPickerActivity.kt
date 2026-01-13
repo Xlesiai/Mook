@@ -20,7 +20,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.mook.ui.theme.MookTheme
+import androidx.core.content.edit
+import com.example.mook.data.local.datasource.SettingsDataSourceImpl
+import dagger.hilt.android.AndroidEntryPoint
 
+// FolderPickerActivity.kt - Simplified version
+@AndroidEntryPoint
 class FolderPickerActivity : ComponentActivity() {
 
     companion object {
@@ -54,100 +59,89 @@ class FolderPickerActivity : ComponentActivity() {
         startActivityForResult(intent, REQUEST_CODE_FOLDER_PICKER)
     }
 
-    // FolderPickerActivity.kt - Updated onActivityResult
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == REQUEST_CODE_FOLDER_PICKER) {
-            if (resultCode == Activity.RESULT_OK) {
+            if (resultCode == RESULT_OK) {
                 val uri = data?.data
                 if (uri != null) {
-                    // 1. Take persistable URI permission (CRITICAL STEP)
+                    // Take persistable permission
                     contentResolver.takePersistableUriPermission(
                         uri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION
                     )
 
-                    // 2. Save the URI string to SharedPreferences/DataStore
-                    saveFolderUri(uri.toString())
-
+                    // Just return the URI - ViewModel will handle saving
                     val resultIntent = Intent().apply {
                         putExtra(EXTRA_SELECTED_URI, uri.toString())
                     }
-                    setResult(Activity.RESULT_OK, resultIntent)
+                    setResult(RESULT_OK, resultIntent)
                 }
             } else {
-                setResult(Activity.RESULT_CANCELED)
+                setResult(RESULT_CANCELED)
             }
             finish()
         }
     }
 
-    private fun saveFolderUri(uriString: String) {
-        val sharedPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        with(sharedPrefs.edit()) {
-            putString("selected_folder_uri", uriString)
-            apply() // or commit() for immediate save
-        }
-    }}
-
-@Composable
-fun FolderPickerScreen(
-    onPickFolder: () -> Unit,
-    onCancel: () -> Unit
-)
-{
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    @Composable
+    fun FolderPickerScreen(
+        onPickFolder: () -> Unit,
+        onCancel: () -> Unit
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-
-            Icon(
-                imageVector = Icons.Default.Folder,
-                contentDescription = "Folder",
-                modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-
-            Text(
-                text = "Select Audiobook Folder",
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center
-            )
-
-            Text(
-                text = "Choose the folder where your audiobooks are stored. Mook will scan this folder and all subfolders for audiobook files.",
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                Button(
-                    onClick = onPickFolder,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Choose Folder")
-                }
+                Spacer(modifier = Modifier.weight(1f))
 
-                TextButton(
-                    onClick = onCancel,
-                    modifier = Modifier.fillMaxWidth()
+                Icon(
+                    imageVector = Icons.Default.Folder,
+                    contentDescription = "Folder",
+                    modifier = Modifier.size(80.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
+                Text(
+                    text = "Select Audiobook Folder",
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center
+                )
+
+                Text(
+                    text = "Choose the folder where your audiobooks are stored. Mook will scan this folder and all subfolders for audiobook files.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Cancel")
+                    Button(
+                        onClick = onPickFolder,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Choose Folder")
+                    }
+
+                    TextButton(
+                        onClick = onCancel,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Cancel")
+                    }
                 }
             }
         }

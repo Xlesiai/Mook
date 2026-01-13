@@ -1,10 +1,13 @@
 package com.example.mook.presentation.library
 
+import android.app.Activity
 import android.app.Application
+import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mook.data.local.database.entities.BookEntity
+import com.example.mook.data.local.datasource.SettingsDataSourceImpl
 import com.example.mook.domain.repository.BookRepository
 import com.example.mook.service.scanner.AudiobookScanner
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,11 +16,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
     private val bookRepository: BookRepository,
     private val audiobookScanner: AudiobookScanner,
+    private val settingsDataSource: SettingsDataSourceImpl,
     private val application: Application
 ) : ViewModel() {
 
@@ -88,6 +93,40 @@ class LibraryViewModel @Inject constructor(
             }
         }
     }
+
+    // method to handle folder picker result
+    fun handleFolderPickerResult(resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK) {
+            val uriString = data?.getStringExtra(FolderPickerActivity.EXTRA_SELECTED_URI)
+            if (uriString != null) {
+                viewModelScope.launch {
+                    // 1. Save the URI
+                    settingsDataSource.saveLibraryFolderUri(uriString)
+
+                    // 2. Scan the folder
+                    val uri = uriString.toUri()
+                    scanFolder(uri)
+                }
+            }
+        }
+    }
+
+    // method to scan from saved URI
+    fun scanFromSavedLibrary() {
+        viewModelScope.launch {
+            val savedUri = settingsDataSource.getLibraryFolderUri()
+            if (savedUri != null) {
+                val uri = savedUri.toUri()
+                scanFolder(uri)
+            } else {
+                // No saved folder - maybe show a message
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = "No library folder selected. Please choose a folder first."
+                )
+            }
+        }
+    }
+
 
     // For testing - add sample data
     fun addSampleBooks() {

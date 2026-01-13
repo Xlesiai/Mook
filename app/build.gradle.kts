@@ -7,7 +7,6 @@ plugins {
 
     id("com.google.devtools.ksp")
     id("kotlin-parcelize")
-//    id("kotlin-kapt")
 }
 
 android {

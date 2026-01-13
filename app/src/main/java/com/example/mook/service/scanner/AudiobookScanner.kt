@@ -10,6 +10,7 @@ import com.example.mook.data.local.database.entities.BookEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -39,11 +40,11 @@ class AudiobookScanner @Inject constructor(
         val books = mutableListOf<BookEntity>()
 
         try {
-            Log.d(TAG, "Starting scan from URI: $rootUri")
+            Timber.tag(TAG).d("Starting scan from URI: $rootUri")
             scanDirectoryRecursive(rootUri, null, null, books)
-            Log.d(TAG, "Scan completed. Found ${books.size} books")
+            Timber.tag(TAG).d("Scan completed. Found ${books.size} books")
         } catch (e: Exception) {
-            Log.e(TAG, "Error scanning directory", e)
+            Timber.tag(TAG).e(e, "Error scanning directory")
         }
 
         return@withContext books

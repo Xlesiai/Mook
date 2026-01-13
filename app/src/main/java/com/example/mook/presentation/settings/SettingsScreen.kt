@@ -2,29 +2,45 @@
 package com.example.mook.presentation.settings
 
 import android.app.Activity
+import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.mook.presentation.library.FolderPickerActivity
+import com.example.mook.presentation.library.LibraryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onBackClick: () -> Unit,
-//    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: LibraryViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
+    // Create a launcher for the folder picker
+    val folderPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            // Pass the result to ViewModel
+            viewModel.handleFolderPickerResult(Activity.RESULT_OK, data)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -41,14 +57,25 @@ fun SettingsScreen(
         }
     ) { paddingValues ->
         SettingsContent(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
+            onChooseFolderClick = {
+                // Launch folder picker activity
+                val intent = FolderPickerActivity.createIntent(context as Activity)
+                folderPickerLauncher.launch(intent)
+            },
+            onScanClick = {
+                // Trigger scan from saved folder
+                viewModel.scanFromSavedLibrary()
+            }
         )
     }
 }
 
 @Composable
 fun SettingsContent(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onChooseFolderClick: () -> Unit,
+    onScanClick: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -58,10 +85,7 @@ fun SettingsContent(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         // Playback Settings
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        )
-        {
+        Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -108,9 +132,7 @@ fun SettingsContent(
         }
 
         // Audio Settings
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -151,31 +173,19 @@ fun SettingsContent(
         }
 
         // Library Settings
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        )
-        {
+        Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                val activity = LocalContext.current as Activity
-
                 Text(
                     text = "Library",
                     style = MaterialTheme.typography.titleLarge
                 )
 
-                // In SettingsScreen.kt, update the folder picker button:
+                // Choose Library Folder Button - FIXED
                 Button(
-                    onClick = {
-                        // Launch folder picker activity
-                        val intent = FolderPickerActivity.createIntent(activity)
-                        activity.startActivityForResult(
-                            intent,
-                            FolderPickerActivity.REQUEST_CODE_FOLDER_PICKER
-                        )
-                    },
+                    onClick = onChooseFolderClick,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(Icons.Default.Folder, null, modifier = Modifier.size(18.dp))
@@ -185,8 +195,9 @@ fun SettingsContent(
 
                 Divider()
 
+                // Scan Button - FIXED
                 Button(
-                    onClick = { /* TODO: Implement scan */ },
+                    onClick = onScanClick,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
@@ -201,10 +212,7 @@ fun SettingsContent(
         }
 
         // App Info
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        )
-        {
+        Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -233,10 +241,7 @@ fun SettingsContent(
         }
 
         // Support
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        )
-        {
+        Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -262,9 +267,4 @@ fun SettingsContent(
             }
         }
     }
-}
-
-// Simple ViewModel for Settings
-class SettingsViewModel {
-    // We'll add settings logic here later
 }

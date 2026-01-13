@@ -1,6 +1,7 @@
 package com.example.mook.data.local.datasource
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -9,6 +10,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,6 +27,7 @@ class SettingsDataSourceImpl @Inject constructor(
     }
 
     override suspend fun saveLibraryFolderUri(uriString: String) {
+        Timber.tag("SettingsDataSourceImpl").d("Saving URI: $uriString")
         context.dataStore.edit { preferences ->
             preferences[LIBRARY_FOLDER_URI] = uriString
         }
